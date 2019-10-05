@@ -3,6 +3,7 @@ from flask import jsonify, request
 from fetch import search_buses, search_flights
 from func import majorCityFinder, nearby3, local
 import re
+from flask_cors import CORS, cross_origin
 
 Data = [['Mumbai', 19.0760, 72.8777, 'BOM'],
 ['Ahmedabad', 23.0225, 72.5714, 'AMD'],
@@ -35,9 +36,11 @@ Data = [['Mumbai', 19.0760, 72.8777, 'BOM'],
 
 # Create the application.
 APP = Flask(__name__)
-
+cors = CORS(APP, resources={r"/": {"origins": "*"}})
+APP.config['CORS_HEADERS'] = 'Content-Type'
 
 @APP.route('/bus', methods=['GET', 'POST'])
+@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def bus():
 	data = request.json
 	entry = data.get('entry')
@@ -298,8 +301,10 @@ def bus():
 
 
 @APP.route('/flight', methods=['GET', 'POST'])
+@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def flight():
 	data = request.json
+	print(data)
 	entry = data.get('entry')
 	dest = data.get('dest')
 	date = data.get('date')
@@ -554,4 +559,4 @@ def flight():
 
 if __name__ == '__main__':
     APP.debug=True
-    APP.run()
+    APP.run(port=54545)
