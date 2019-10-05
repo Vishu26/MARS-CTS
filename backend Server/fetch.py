@@ -25,13 +25,29 @@ def search_buses(a, b, date, seats):
 		seats = driver.find_elements_by_xpath("//ul[@class='sc-dxgOiQ BhRgU']")
 		#n_state_bus = len(driver.find_elements_by_xpath("//div[@class='sc-kTUwUJ dmMRtR']")[0].find_elements_by_xpath(".//*"))
 		#n_pri_bus = len(driver.find_elements_by_xpath("//div[@class='sc-kTUwUJ dmMRtR']")[1].find_elements_by_xpath(".//*"))
+		c, dd = [], []
+		for i in cost:
+			c.append(i.text)
+		least = np.argmin(c)
+		for k in timing_duration:
+			z = k.text.split(' ')
+			print(z)
+			if len(z)==1:
+				if z[0][-1]=='h':
+					dd.append(int(z[0][:-1])*60)
+				else:
+					dd.append(int(z[1][:-1]))
+			else:
+				dd.append(int(z[0][:-1])*60+int(z[1][:-1]))
+		l_d = np.argmin(dd)
+		print(dd)
 		for i in range(len(timing_duration)):
 			d[str(i)] = [timing_start[i].text, timing_duration[i].text, timing_end[i].text, names[i].text+types[i].text, cost[i].text, seats[i].text]
 		driver.close()
 		if d=={}:
 			return -1
 		else:
-			return d
+			return d[str(least)], d[str(l_d)]
 	except Exception as e:
 		print(e)
 		return -1

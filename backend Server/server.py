@@ -48,30 +48,254 @@ def bus():
 	lonEn = data.get('lonEn')
 	latDes = data.get('latDes')
 	lonDes = data.get('lonDes')
-	d = search_buses(entry, dest, date, int(seats))
+	d = -1
 	if d==-1:
 		majorCity1 = majorCityFinder(entry, [latEn, lonEn], Data)  ## Data Load
 		majorCity2 = majorCityFinder(dest, [latDes, latDes], Data)
 		cas = -1
 		if majorCity1[1]==-1 and majorCity2[1]==-1:
-			d = search_buses(entry, dest, date, int(seats))
+			d1, dd1 = search_buses(majorCity1[0][0], majorCity2[0][0], date, int(seats))
 			cas=1
-		elif majorCity1[1]==1 and majorCity2[1]==1:
-			d = search_buses(majorCity1[0][0], majorCity2[0][0], date, int(seats))
+			price_a_local = local(majorCity1[3])
+			price_b_local = local(majorCity2[3])
+			packages = {'case':1,
+						'Package1':{'A':entry,
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d1,
+									'Bus Price':d1[4],
+									'Total Price':float(re.sub(',','', d1[4]))+price_a_local[1]+price_b_local[1],
+									'Local A': price_a_local[0],
+									'Local B': price_b_local[1]},
+						'Package2':{'A':entry,
+									'D':dest,
+									'Type':'Time effective', 
+									'Bus Details':dd1,
+									'Bus Price':dd1[4],
+									'Total Price':float(re.sub(',','', dd1[4]))+price_a_local[1]+price_b_local[1],
+									'Local A': price_a_local[0],
+									'Local B': price_b_local[1]}
+						}
+		elif majorCity1[1]!=-1 and majorCity2[1]!=-1:
+			a1, b1, c1 = nearby3(entry, [latEn, lonEn], Data)
+			a2, b2, c2 = nearby3(dest, [latDes, lonDes], Data)
+			print(a1)
+			d1, dd1 = search_buses(a1[0][0], a2[0][0], date, int(seats))
+			d2, dd2 = search_buses(a1[0][0], b2[0][0], date, int(seats))
+			d3, dd3 = search_buses(b1[0][0], a2[0][0], date, int(seats))
+			d4, dd4 = search_buses(b1[0][0], b2[0][0], date, int(seats))
 			cas=2
-		elif majorCity1[1]==1:
-			d = search_buses(majorCity1[0][0], dest, date, int(seats))
+
+			packages = {'case':2,
+						'Package1':{'A':entry,
+									'B':a1[0][0],
+									'C':a2[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d1,
+									'Bus Price':d1[4],
+									'Total Price':float(re.sub(',','',d1[4]))+local(a1[3])[1]+local(a2[3])[1],
+									'Local A': local(a1[2])[0],
+									'Local B': local(a2[2])[0]},
+						'Package2':{'A':entry,
+									'B':a1[0][0],
+									'C':b2[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d2,
+									'Bus Price':d2[4],
+									'Total Price':float(re.sub(',','',d2[4]))+local(a1[3])[1]+local(b2[3])[1],
+									'Local A': local(a1[2])[0],
+									'Local B': local(b2[2])[0]},
+						'Package3':{'A':entry,
+									'B':a1[0][0],
+									'C':a2[0][0],
+									'D':dest,
+									'Type':'Time effective', 
+									'Bus Details':dd1,
+									'Bus Price':dd1[4],
+									'Total Price':float(re.sub(',','',dd1[4]))+local(a1[3])[1]+local(a2[3])[1],
+									'Local A': local(a1[2])[0],
+									'Local B': local(a2[2])[0]},
+						'Package4':{'A':entry,
+									'B':a1[0][0],
+									'C':b2[0][0],
+									'D':dest,
+									'Type':'Time Effective', 
+									'Bus Details':dd2,
+									'Bus Price':dd2[4],
+									'Total Price':float(re.sub(',','',dd2[4]))+local(a1[3])[1]+local(b2[3])[1],
+									'Local A': local(b1[2])[0],
+									'Local B': local(b2[2])[0]},
+						'Package5':{'A':entry,
+									'B':b1[0][0],
+									'C':a2[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d3,
+									'Bus Price':d3[4],
+									'Total Price':float(re.sub(',','',d3[4]))+local(b1[3])[1]+local(a2[3])[1],
+									'Local A': local(b1[2])[0],
+									'Local B': local(a2[2])[0]},
+						'Package6':{'A':entry,
+									'B':b1[0][0],
+									'C':a2[0][0],
+									'D':dest,
+									'Type':'Time Effective', 
+									'Bus Details':dd3,
+									'Bus Price':dd3[4],
+									'Total Price':float(re.sub(',','',dd3[4]))+local(b1[3])[1]+local(a2[3])[1],
+									'Local A': local(b1[2])[0],
+									'Local B': local(a2[2])[0]},
+						'Package7':{'A':entry,
+									'B':b1[0][0],
+									'C':b2[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d4,
+									'Bus Price':d4[4],
+									'Total Price':float(re.sub(',','',d4[4]))+local(b1[3])[1]+local(b2[3])[1],
+									'Local A': local(b1[2])[0],
+									'Local B': local(b2[2])[0]},
+						'Package8':{'A':entry,
+									'B':b1[0][0],
+									'C':b2[0][0],
+									'D':dest,
+									'Type':'Time Effective', 
+									'Bus Details':dd4,
+									'Bus Price':dd4[4],
+									'Total Price':float(re.sub(',','',dd4[4]))+local(b1[3])[1]+local(b2[3])[1],
+									'Local A': local(b1[2])[0],
+									'Local B': local(b2[2])[0]}
+									}
+
+		elif majorCity1[1]!=-1:
+			a1, b1, c1 = nearby3(entry, [latEn, lonEn], Data)
+			print(a1, b1, c1)
+			d1, dd1 = search_buses(a1[0][0], majorCity2[0][0], date, int(seats))
+			d2, dd2 = search_buses(b1[0][0], majorCity2[0][0], date, int(seats))
+			d3, dd3 = search_buses(c1[0][0], majorCity2[0][0], date, int(seats))
 			cas=3
+			packages = {'case':3,
+						'Package1':{'A':entry,
+									'B':a1[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d1,
+									'Bus Price':d1[4],
+									'Total Price':float(re.sub(',','',d1[4]))+local(a1[3])[1],
+									'Local A': local(a1[2])[0],
+									},
+						'Package2':{'A':entry,
+									'B':b1[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d2,
+									'Bus Price':d2[4],
+									'Total Price':float(re.sub(',','',d2[4]))+local(b1[3])[1],
+									'Local A': local(b1[2])[0]},
+						'Package3':{'A':entry,
+									'B':a1[0][0],
+									'D':dest,
+									'Type':'Time effective', 
+									'Bus Details':dd1,
+									'Bus Price':dd1[4],
+									'Total Price':float(re.sub(',','',dd1[4]))+local(a1[3])[1],
+									'Local A': local(a1[2])[0]},
+						'Package4':{'A':entry,
+									'B':b1[0][0],
+									'D':dest,
+									'Type':'Time Effective', 
+									'Bus Details':dd2,
+									'Bus Price':dd2[4],
+									'Total Price':float(re.sub(',','',dd2[4]))+local(a1[3])[1],
+									'Local A': local(b1[2])[0]},
+						'Package5':{'A':entry,
+									'B':c1[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d3,
+									'Bus Price':d3[4],
+									'Total Price':float(re.sub(',','',d3[4]))+local(c1[3])[1],
+									'Local A': local(c1[2])[0],
+									},
+						'Package6':{'A':entry,
+									'B':c1[0][0],
+									'D':dest,
+									'Type':'Time Effective', 
+									'Bus Details':dd3,
+									'Bus Price':dd3[4],
+									'Total Price':float(re.sub(',','',dd3[4]))+local(c1[3])[1],
+									'Local A': local(c1[2])[0]}
+						}
 		else:
-			d = search_buses(entry, majorCity2[0][0], date, int(seats))
+			print('--------------', majorCity1[0][0])
+			a1, b1, c1 = nearby3(dest, [latDes, lonDes], Data)
+			d1, dd1 = search_buses(majorCity1[0][0], a1[0][0], date, int(seats))
+			d2, dd2 = search_buses(majorCity1[0][0], b1[0][0], date, int(seats))
+			d3, dd3 = search_buses(majorCity1[0][0], c1[0][0], date, int(seats))
 			cas=4
-		print(d)
+			packages = {'case':4,
+						'Package1':{'A':entry,
+									'C':a1[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d1,
+									'Bus Price':d1[4],
+									'Total Price':float(re.sub(',','', d1[4]))+local(a1[2])[1],
+									'Local B': local(a1[2])[0],
+									},
+						'Package2':{'A':entry,
+									'C':b1[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d2,
+									'Bus Price':d2[4],
+									'Total Price':float(re.sub(',','', d2[4]))+local(b1[2])[1],
+									'Local B': local(b1[2])[0]},
+						'Package3':{'A':entry,
+									'C':a1[0][0],
+									'D':dest,
+									'Type':'Time effective', 
+									'Bus Details':dd1,
+									'Bus Price':dd1[4],
+									'Total Price':float(re.sub(',','', dd1[4]))+local(a1[2])[1],
+									'Local B': local(a1[2])[0]},
+						'Package4':{'A':entry,
+									'C':b1[0][0],
+									'D':dest,
+									'Type':'Time Effective', 
+									'Bus Details':dd2,
+									'Bus Price':dd2[4],
+									'Total Price':float(re.sub(',','',dd2[4]))+local(a1[2])[1],
+									'Local B': local(b1[2])[0]},
+						'Package5':{'A':entry,
+									'C':c1[0][0],
+									'D':dest,
+									'Type':'Cost Effective', 
+									'Bus Details':d3,
+									'Bus Price':d3[4],
+									'Total Price':float(re.sub(',','',d3[4]))+local(c1[2])[1],
+									'Local B': local(c1[2])[0],
+									},
+						'Package6':{'A':entry,
+									'C':c1[0][0],
+									'D':dest,
+									'Type':'Time Effective', 
+									'Bus Details':dd3,
+									'Bus Price':dd3[4],
+									'Total Price':float(re.sub(',','',dd3[4]))+local(c1[2])[1],
+									'Local B': local(c1[2])[0]}
+						}
 
-		d['majorCity1'] = majorCity1[0][0]
-		d['majorCity2'] = majorCity2[0][0]
-		d['case'] = cas
 
-	return jsonify(d)
+	return jsonify(packages)
+
+
+
+
+
+
 
 @APP.route('/flight', methods=['GET', 'POST'])
 def flight():
@@ -101,7 +325,7 @@ def flight():
 								'Type':'Cost Effective', 
 								'Flight Details':d1,
 								'Flight Price':d1[4],
-								'Total Price':d1[4]+price_a_local[1]+price_b_local[1],
+								'Total Price':float(re.sub(',','',d1[4]))+price_a_local[1]+price_b_local[1],
 								'Local A': price_a_local[0],
 								'Local B': price_b_local[1]},
 					'Package2':{'A':entry,
@@ -109,7 +333,7 @@ def flight():
 								'Type':'Time effective', 
 								'Flight Details':dd1,
 								'Flight Price':dd1[4],
-								'Total Price':dd1[4]+price_a_local[1]+price_b_local[1],
+								'Total Price':float(re.sub(',','',dd1[4]))+price_a_local[1]+price_b_local[1],
 								'Local A': price_a_local[0],
 								'Local B': price_b_local[1]}
 					}
@@ -132,9 +356,9 @@ def flight():
 								'Type':'Cost Effective', 
 								'Flight Details':d1,
 								'Flight Price':d1[4],
-								'Total Price':d1[4]+local(a1[3])[1]+local(a2[3])[1],
-								'Local A': local(a1[3])[0],
-								'Local B': local(a2[3])[0]},
+								'Total Price':float(re.sub(',','',d1[4]))+local(a1[3])[1]+local(a2[3])[1],
+								'Local A': local(a1[2])[0],
+								'Local B': local(a2[2])[0]},
 					'Package2':{'A':entry,
 								'B':a1[0][0],
 								'C':b2[0][0],
@@ -142,9 +366,9 @@ def flight():
 								'Type':'Cost Effective', 
 								'Flight Details':d2,
 								'Flight Price':d2[4],
-								'Total Price':d2[4]+local(a1[3])[1]+local(b2[3])[1],
-								'Local A': local(a1[3])[0],
-								'Local B': local(b2[3])[0]},
+								'Total Price':float(re.sub(',','',d2[4]))+local(a1[3])[1]+local(b2[3])[1],
+								'Local A': local(a1[2])[0],
+								'Local B': local(b2[2])[0]},
 					'Package3':{'A':entry,
 								'B':a1[0][0],
 								'C':a2[0][0],
@@ -152,9 +376,9 @@ def flight():
 								'Type':'Time effective', 
 								'Flight Details':dd1,
 								'Flight Price':dd1[4],
-								'Total Price':dd1[4]+local(a1[3])[1]+local(a2[3])[1],
-								'Local A': local(a1[3])[0],
-								'Local B': local(a2[3])[0]},
+								'Total Price':float(re.sub(',','',dd1[4]))+local(a1[3])[1]+local(a2[3])[1],
+								'Local A': local(a1[2])[0],
+								'Local B': local(a2[2])[0]},
 					'Package4':{'A':entry,
 								'B':a1[0][0],
 								'C':b2[0][0],
@@ -162,9 +386,9 @@ def flight():
 								'Type':'Time Effective', 
 								'Flight Details':dd2,
 								'Flight Price':dd2[4],
-								'Total Price':dd2[4]+local(a1[3])[1]+local(b2[3])[1],
-								'Local A': local(b1[3])[0],
-								'Local B': local(b2[3])[0]},
+								'Total Price':float(re.sub(',','',dd2[4]))+local(a1[3])[1]+local(b2[3])[1],
+								'Local A': local(b1[2])[0],
+								'Local B': local(b2[2])[0]},
 					'Package5':{'A':entry,
 								'B':b1[0][0],
 								'C':a2[0][0],
@@ -172,9 +396,9 @@ def flight():
 								'Type':'Cost Effective', 
 								'Flight Details':d3,
 								'Flight Price':d3[4],
-								'Total Price':d3[4]+local(b1[3])[1]+local(a2[3])[1],
-								'Local A': local(b1[3])[0],
-								'Local B': local(a2[3])[0]},
+								'Total Price':float(re.sub(',','',d3[4]))+local(b1[3])[1]+local(a2[3])[1],
+								'Local A': local(b1[2])[0],
+								'Local B': local(a2[2])[0]},
 					'Package6':{'A':entry,
 								'B':b1[0][0],
 								'C':a2[0][0],
@@ -182,9 +406,9 @@ def flight():
 								'Type':'Time Effective', 
 								'Flight Details':dd3,
 								'Flight Price':dd3[4],
-								'Total Price':dd3[4]+local(b1[3])[1]+local(a2[3])[1],
-								'Local A': local(b1[3])[0],
-								'Local B': local(a2[3])[0]},
+								'Total Price':float(re.sub(',','',dd3[4]))+local(b1[3])[1]+local(a2[3])[1],
+								'Local A': local(b1[2])[0],
+								'Local B': local(a2[2])[0]},
 					'Package7':{'A':entry,
 								'B':b1[0][0],
 								'C':b2[0][0],
@@ -192,9 +416,9 @@ def flight():
 								'Type':'Cost Effective', 
 								'Flight Details':d4,
 								'Flight Price':d4[4],
-								'Total Price':d4[4]+local(b1[3])[1]+local(b2[3])[1],
-								'Local A': local(b1[3])[0],
-								'Local B': local(b2[3])[0]},
+								'Total Price':float(re.sub(',','',d4[4]))+local(b1[3])[1]+local(b2[3])[1],
+								'Local A': local(b1[2])[0],
+								'Local B': local(b2[2])[0]},
 					'Package8':{'A':entry,
 								'B':b1[0][0],
 								'C':b2[0][0],
@@ -202,9 +426,9 @@ def flight():
 								'Type':'Time Effective', 
 								'Flight Details':dd4,
 								'Flight Price':dd4[4],
-								'Total Price':dd4[4]+local(b1[3])[1]+local(b2[3])[1],
-								'Local A': local(b1[3])[0],
-								'Local B': local(b2[3])[0]}
+								'Total Price':float(re.sub(',','',dd4[4]))+local(b1[3])[1]+local(b2[3])[1],
+								'Local A': local(b1[2])[0],
+								'Local B': local(b2[2])[0]}
 
 					}
 	elif majorCity1[1]!=-1:
@@ -221,8 +445,8 @@ def flight():
 								'Type':'Cost Effective', 
 								'Flight Details':d1,
 								'Flight Price':d1[4],
-								'Total Price':d1[4]+local(a1[3])[1],
-								'Local A': local(a1[3])[0],
+								'Total Price':float(re.sub(',','',d1[4]))+local(a1[3])[1],
+								'Local A': local(a1[2])[0],
 								},
 					'Package2':{'A':entry,
 								'B':b1[0][0],
@@ -230,32 +454,32 @@ def flight():
 								'Type':'Cost Effective', 
 								'Flight Details':d2,
 								'Flight Price':d2[4],
-								'Total Price':d2[4]+local(b1[3])[1],
-								'Local A': local(b1[3])[0]},
+								'Total Price':float(re.sub(',','',d2[4]))+local(b1[3])[1],
+								'Local A': local(b1[2])[0]},
 					'Package3':{'A':entry,
 								'B':a1[0][0],
 								'D':dest,
 								'Type':'Time effective', 
 								'Flight Details':dd1,
 								'Flight Price':dd1[4],
-								'Total Price':dd1[4]+local(a1[3])[1],
-								'Local A': local(a1[3])[0]},
+								'Total Price':float(re.sub(',','',dd1[4]))+local(a1[3])[1],
+								'Local A': local(a1[2])[0]},
 					'Package4':{'A':entry,
 								'B':b1[0][0],
 								'D':dest,
 								'Type':'Time Effective', 
 								'Flight Details':dd2,
 								'Flight Price':dd2[4],
-								'Total Price':dd2[4]+local(a1[3])[1],
-								'Local A': local(b1[3])[0]},
+								'Total Price':float(re.sub(',','',dd2[4]))+local(a1[3])[1],
+								'Local A': local(b1[2])[0]},
 					'Package5':{'A':entry,
 								'B':c1[0][0],
 								'D':dest,
 								'Type':'Cost Effective', 
 								'Flight Details':d3,
 								'Flight Price':d3[4],
-								'Total Price':d3[4]+local(c1[3])[1],
-								'Local A': local(c1[3])[0],
+								'Total Price':float(re.sub(',','',d3[4]))+local(c1[3])[1],
+								'Local A': local(c1[2])[0],
 								},
 					'Package6':{'A':entry,
 								'B':c1[0][0],
@@ -263,8 +487,8 @@ def flight():
 								'Type':'Time Effective', 
 								'Flight Details':dd3,
 								'Flight Price':dd3[4],
-								'Total Price':dd3[4]+local(c1[3])[1],
-								'Local A': local(c1[3])[0]}
+								'Total Price':float(re.sub(',','',dd3[4]))+local(c1[3])[1],
+								'Local A': local(c1[2])[0]}
 					}
 	else:
 		print("HERE")
@@ -273,7 +497,7 @@ def flight():
 		d2, dd2 = search_flights(majorCity1, b1, date, int(seats))
 		d3, dd3 = search_flights(majorCity1, c1, date, int(seats))
 		cas=4
-		packages = {'case':3,
+		packages = {'case':4,
 					'Package1':{'A':entry,
 								'C':a1[0][0],
 								'D':dest,
@@ -281,7 +505,7 @@ def flight():
 								'Flight Details':d1,
 								'Flight Price':d1[4],
 								'Total Price':float(re.sub(',','', d1[4]))+local(a1[2])[1],
-								'Local A': local(a1[2])[0],
+								'Local B': local(a1[2])[0],
 								},
 					'Package2':{'A':entry,
 								'C':b1[0][0],
@@ -290,7 +514,7 @@ def flight():
 								'Flight Details':d2,
 								'Flight Price':d2[4],
 								'Total Price':float(re.sub(',','', d2[4]))+local(b1[2])[1],
-								'Local A': local(b1[2])[0]},
+								'Local B': local(b1[2])[0]},
 					'Package3':{'A':entry,
 								'C':a1[0][0],
 								'D':dest,
@@ -298,7 +522,7 @@ def flight():
 								'Flight Details':dd1,
 								'Flight Price':dd1[4],
 								'Total Price':float(re.sub(',','', dd1[4]))+local(a1[2])[1],
-								'Local A': local(a1[2])[0]},
+								'Local B': local(a1[2])[0]},
 					'Package4':{'A':entry,
 								'C':b1[0][0],
 								'D':dest,
@@ -306,7 +530,7 @@ def flight():
 								'Flight Details':dd2,
 								'Flight Price':dd2[4],
 								'Total Price':float(re.sub(',','',dd2[4]))+local(a1[2])[1],
-								'Local A': local(b1[2])[0]},
+								'Local B': local(b1[2])[0]},
 					'Package5':{'A':entry,
 								'C':c1[0][0],
 								'D':dest,
@@ -314,7 +538,7 @@ def flight():
 								'Flight Details':d3,
 								'Flight Price':d3[4],
 								'Total Price':float(re.sub(',','',d3[4]))+local(c1[2])[1],
-								'Local A': local(c1[2])[0],
+								'Local B': local(c1[2])[0],
 								},
 					'Package6':{'A':entry,
 								'C':c1[0][0],
@@ -323,7 +547,7 @@ def flight():
 								'Flight Details':dd3,
 								'Flight Price':dd3[4],
 								'Total Price':float(re.sub(',','',dd3[4]))+local(c1[2])[1],
-								'Local A': local(c1[2])[0]}
+								'Local B': local(c1[2])[0]}
 					}
 
 	return jsonify(packages)
