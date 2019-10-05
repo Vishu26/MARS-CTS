@@ -19,11 +19,12 @@ def majorCityFinder(name, currLoc, Data):
 
 
 def nearby3(name, currLoc, Data):
-	a = majorCityFinder(name, currLoc, Data)
-	Data.pop(a[1])
-	b = majorCityFinder(name, currLoc, Data)
-	Data.pop(b[1])
-	c = majorCityFinder(name, currLoc, Data)
+	gg = Data.copy()
+	a = majorCityFinder(name, currLoc, gg)
+	gg.pop(a[1])
+	b = majorCityFinder(name, currLoc, gg)
+	gg.pop(b[1])
+	c = majorCityFinder(name, currLoc, gg)
 	return a, b, c
 
 def local(dist):

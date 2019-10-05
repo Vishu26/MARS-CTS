@@ -286,7 +286,7 @@ def bus():
 									'Type':'Time Effective', 
 									'Bus Details':dd2,
 									'Bus Price':dd2[4],
-									'Total Price':float(re.sub(',','',dd2[4]))+local(a1[2])[1],
+									'Total Price':float(re.sub(',','',dd2[4]))+local(b1[2])[1],
 									'Local B': local(b1[2])[0]},
 						'Package5':{'A':entry,
 									'C':c1[0][0],
@@ -545,7 +545,7 @@ def flight():
 								'Type':'Time Effective', 
 								'Flight Details':dd2,
 								'Flight Price':dd2[4],
-								'Total Price':float(re.sub(',','',dd2[4]))+local(a1[2])[1],
+								'Total Price':float(re.sub(',','',dd2[4]))+local(b1[2])[1],
 								'Local B': local(b1[2])[0]},
 					'Package5':{'A':entry,
 								'C':c1[0][0],
@@ -570,4 +570,4 @@ def flight():
 
 if __name__ == '__main__':
     APP.debug=True
-    APP.run(port=54545)
+    APP.run('10.200.41.180', port=54545)
