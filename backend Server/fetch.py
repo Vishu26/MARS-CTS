@@ -2,6 +2,28 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 import numpy as np
+import re
+
+def lat_lon(city):
+	try:
+		driver = webdriver.Chrome(ChromeDriverManager().install())
+		driver.get('https://www.google.com/maps')
+		driver.find_element_by_xpath("//input[@id='searchboxinput']").send_keys(city)
+		driver.find_element_by_xpath("//button[@id='searchbox-searchbutton']").click()
+		sleep(5)
+		url = driver.current_url
+		url = (re.findall(r'@.+/', url)[0])[1:-1].split(',')
+		lat = url[0][:-2]
+		lon = url[1][:-2]
+		driver.close()
+		return lat, lon
+	except Exception as e:
+		print(e)
+		driver.close()
+		return -1
+
+
+
 def search_buses(a, b, date, seats):
 	try:
 		driver = webdriver.Chrome(ChromeDriverManager().install())

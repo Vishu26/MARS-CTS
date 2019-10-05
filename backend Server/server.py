@@ -1,6 +1,6 @@
 from flask import Flask
 from flask import jsonify, request
-from fetch import search_buses, search_flights
+from fetch import search_buses, search_flights, lat_lon
 from func import majorCityFinder, nearby3, local
 import re
 from flask_cors import CORS, cross_origin
@@ -39,18 +39,35 @@ APP = Flask(__name__)
 cors = CORS(APP, resources={r"/": {"origins": "*"}})
 APP.config['CORS_HEADERS'] = 'Content-Type'
 
+latEn, lonEn = 0, 0
+latDes, lonDes = 0, 0
+
+@APP.route('/locate', methods=['GET', 'POST'])
+@cross_origin(origin='*',headers=['Content-Type','Authorization'])
+def Locate():
+	global latEn, lonEn, latDes, lonDes
+	data = request.json
+	latEn, lonEn = lat_lon(data.get('entry'))
+	latDes, latDes = lat_lon(data.get('dest'))
+	return
+
+@APP.route('/locate1', methods=['GET', 'POST'])
+@cross_origin(origin='*',headers=['Content-Type','Authorization'])
+def Locate1():
+	global latEn, lonEn
+	data = request.json
+	latEn, lonEn = lat_lon(data.get('city'))
+	return jsonify(geometry={'lat':latEn, 'lon':lonEn})
+
 @APP.route('/bus', methods=['GET', 'POST'])
 @cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def bus():
+	global latEn, lonEn, latDes, lonDes
 	data = request.json
 	entry = data.get('entry')
 	dest = data.get('dest')
 	date = data.get('date')
 	seats = data.get('seats')
-	latEn = data.get('latEn')                                     ## Get current location from front end
-	lonEn = data.get('lonEn')
-	latDes = data.get('latDes')
-	lonDes = data.get('lonDes')
 	d = -1
 	if d==-1:
 		majorCity1 = majorCityFinder(entry, [latEn, lonEn], Data)  ## Data Load
@@ -232,7 +249,6 @@ def bus():
 									'Local A': local(c1[2])[0]}
 						}
 		else:
-			print('--------------', majorCity1[0][0])
 			a1, b1, c1 = nearby3(dest, [latDes, lonDes], Data)
 			d1, dd1 = search_buses(majorCity1[0][0], a1[0][0], date, int(seats))
 			d2, dd2 = search_buses(majorCity1[0][0], b1[0][0], date, int(seats))
@@ -298,21 +314,16 @@ def bus():
 
 
 
-
-
 @APP.route('/flight', methods=['GET', 'POST'])
 @cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def flight():
+	global latEn, lonEn, latDes, lonDes
 	data = request.json
 	print(data)
 	entry = data.get('entry')
 	dest = data.get('dest')
 	date = data.get('date')
 	seats = data.get('seats')
-	latEn = data.get('latEn')                                     ## Get current location from front end
-	lonEn = data.get('lonEn')
-	latDes = data.get('latDes')
-	lonDes = data.get('lonDes')
 	majorCity1 = majorCityFinder(entry, [latEn, lonEn], Data)
 	majorCity2 = majorCityFinder(dest, [latDes, latDes], Data)
 	print(majorCity1)
